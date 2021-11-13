@@ -8,13 +8,13 @@
 
 顶部状态栏
 
-[img](s3.gif)
+![img](s3.gif)
 
-[img](s1.png)
+![img](s1.png)
 
 待机界面（15分钟）
 
-[img](s2.png)
+![img](s2.png)
 
 # 使用方式
 
