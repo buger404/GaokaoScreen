@@ -25,6 +25,7 @@ Private Sub Class_Initialize()
     SearchIndex = 1
     NoLoadDirection = True
     NoLoadCrash = True
+    HotLoad = True
 End Sub
 Public Sub ClipCircle(n)
     Dim index As Integer

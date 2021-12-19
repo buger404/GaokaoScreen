@@ -384,7 +384,7 @@ skipLoading:
     
     Page.Writes "ÕýÔÚÆô¶¯ " & Int(pro * 100) & "%", GW / 2, GH / 2 + (GH * 0.2 / 2 + 17 - 40) * tpro2, 16, argb(200 * tpro2, 242, 242, 242), align:=StringAlignmentCenter
 
-    If DisableLOGO Or True Then
+    If DisableLOGO Then
         ECore.NewTransform transFadeIn, 500
         DoneMark = True
         Exit Sub

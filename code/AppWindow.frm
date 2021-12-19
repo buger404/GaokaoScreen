@@ -40,17 +40,16 @@ Attribute VB_Exposed = False
 
 Private Sub Form_Load()
     Me.Move 0, 0, Screen.Width / Screen.TwipsPerPixelX + 1, Screen.Height / Screen.TwipsPerPixelY + 1
-    SetWindowPos AppWindow.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE Or SWP_NOMOVE
+    If App.LogMode <> 0 Then SetWindowPos AppWindow.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE Or SWP_NOMOVE
     StartEmerald Me.Hwnd, Screen.Width / Screen.TwipsPerPixelX + 1, Screen.Height / Screen.TwipsPerPixelY + 1 '初始化Emerald（在此处可以修改窗口大小）
     Set EF = New GFont
-    EF.AddFont App.path & "\ui.ttf"
-    EF.MakeFont "三极则木简体"
+    EF.MakeFont "微软雅黑"
    
     Set EC = New GMan   '创建页面管理器
     EC.Layered False
     '创建存档（可选），存档key的问题请查看Emerald的wiki
-    'Set ESave = New GSaving
-    'ESave.Create "emerald.test", "Emerald.test"
+    Set ESave = New GSaving
+    ESave.Create "GaokaoScreen.2022.Buger404", "我只会心疼gie gie~"
     
     '创建音乐列表（可选）
     'Set MusicList = New GMusicList
