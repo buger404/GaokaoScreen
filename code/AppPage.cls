@@ -65,8 +65,8 @@ Public Sub Update()
         lockBgn = Int(Rnd * 23) + 1
     End If
 
-    If Hour(Now) = 22 And Minute(Now) >= 29 And App.LogMode <> 0 Then
-        Page.DrawImage "ohmygod.png", 20 + Sin((GetTickCount Mod 100) / 100 * 6.28) * 2, 10, alpha:=0.7 + Sin((GetTickCount Mod 1000) / 1000 * 3.14) * 0.3
+    If Hour(Now) = 22 And Minute(Now) >= 30 And App.LogMode <> 0 Then
+        Page.DrawImage "ohmygod.png", GW / 2, 50, alpha:=1, pos:=posOnCenter
         Exit Sub
     End If
     
@@ -135,6 +135,8 @@ Public Sub Update()
         switchTime = GetTickCount
         Mouse.State = 0
     End If
+    If Not setMode And pros1 = 1 Then Sleep 300
+    
     If DateDiff("d", Now, Gaokao) < 0 Then
         Page.Writes "已到期", 92, 19, 32, Color:=argb(255 * pros1, 255, 255, 255), align:=StringAlignmentCenter, style:=FontStyleBold
     Else
@@ -296,51 +298,36 @@ bypass1:
         pros2 = pro2
     End If
     If pro2 = 0 Then GoTo bypass2
-    Page.DrawImage "wallspaper (" & lockBgn & ").jpg", 0, 0, alpha:=pro2
+    'Page.DrawImage "wallspaper (" & lockBgn & ").jpg", 0, 0, alpha:=pro2
     'PaintDC ScrBlurDC, Page.CDC, 120 * pro2, 120 * pro2, 120 * pro2, 120 * pro2, GW - 240 * pro2, GH - 240 * pro2, alpha:=pro2
     'Page.Paint 0, 120 * pro2, 120 * pro2, GW - 240 * pro2 + 1, GH - 240 * pro2 + 1, argb(pro2 * 200, 1, 1, 1)
     Page.Paint 0, 0, 0, GW + 1, GH + 1, argb(pro2 * 230, 1, 1, 1)
 
-    Dim p(), leftD As Single, DY As Long
-    ReDim p(1)
+    '37,179,253 -> 179,36,255
+
+    Dim leftD As Single, DX As Long, DY As Long, BY As Long, NX As Long, NY As Long, dP As Single
     leftD = DateDiff("d", Now, Gaokao)
-    DY = 120 + 0.5 * (GH - 240)
-    p(0) = 0: p(1) = DY + Sin(GetTickCount / 6000) * (60 * (leftD / 365))
-    For I = 0 To 30
-        ReDim Preserve p(UBound(p) + 2)
-        p(UBound(p) - 1) = 0 + (I * 1#) / 30 * GW
-        p(UBound(p)) = DY + Sin(GetTickCount / 6000 + I * pros2 / 30 * 5) * (60 * (leftD / 365))
+    BY = 120 + 0.5 * (GH - 240)
+    DX = 0: DY = BY + Sin(GetTickCount / 6000) * (60 * (leftD / 365))
+    For I = 0 To 120
+        dP = (I * 1#) / 120
+        NX = 0 + dP * GW
+        NY = BY + Sin(GetTickCount / 6000 + dP * pros2 * 5) * (60 * (leftD / 365))
+        Page.PaintLine DX, DY, NX, NY, argb((100 + 80 * Sin(GetTickCount / 3000)) * pros2, 37 + (179 - 37) * dP, 179 + (36 - 179) * dP, 253 + (255 - 253) * dP), 2
+        DX = NX: DY = NY
     Next
-    ReDim Preserve p(UBound(p) + 2)
-    p(UBound(p) - 1) = GW
-    p(UBound(p)) = GH
-    ReDim Preserve p(UBound(p) + 2)
-    p(UBound(p) - 1) = 0
-    p(UBound(p)) = GH
-    ReDim Preserve p(UBound(p) + 2)
-    p(UBound(p) - 1) = 0
-    p(UBound(p)) = DY + Sin(GetTickCount / 6000) * (60 * (leftD / 365))
-    Page.PaintPolygon2 argb(10 * pros2, 255, 255, 255), 0, p, False
-    ReDim p(1)
+
     leftD = DateDiff("d", Now, Gaokao)
-    DY = 100 + 0.5 * (GH - 240)
-    p(0) = 0: p(1) = DY + Sin(GetTickCount / 3000 - 3) * (60 * (leftD / 365))
-    For I = 0 To 30
-        ReDim Preserve p(UBound(p) + 2)
-        p(UBound(p) - 1) = 0 + (I * 1#) / 30 * (GW)
-        p(UBound(p)) = DY + Sin(GetTickCount / 3000 + I * pros2 / 30 * 5 - 3) * (60 * (leftD / 365))
+    BY = 100 + 0.5 * (GH - 240)
+    DX = 0: DY = BY + Sin(GetTickCount / 3000 - 3) * (60 * (leftD / 365))
+    For I = 0 To 120
+        dP = (I * 1#) / 120
+        NX = 0 + dP * GW
+        NY = BY + Sin(GetTickCount / 3000 + dP * pros2 * 5 - 3) * (60 * (leftD / 365))
+        Page.PaintLine DX, DY, NX, NY, argb((100 + 80 * Sin(GetTickCount / 6000)) * pros2, 0 + (0 - 0) * dP, 235 + (174 - 235) * dP, 115 + (247 - 115) * dP), 2
+        DX = NX: DY = NY
     Next
-    ReDim Preserve p(UBound(p) + 2)
-    p(UBound(p) - 1) = GW
-    p(UBound(p)) = 120 + GH
-    ReDim Preserve p(UBound(p) + 2)
-    p(UBound(p) - 1) = 0
-    p(UBound(p)) = 120 + GH
-    ReDim Preserve p(UBound(p) + 2)
-    p(UBound(p) - 1) = 0
-    p(UBound(p)) = DY + Sin(GetTickCount / 3000 - 3) * (60 * (leftD / 365))
-    Page.PaintPolygon2 argb(10 * pros2, 255, 255, 255), 0, p, False
-    
+
     Page.Writes "仅剩                天", GW / 2 - 20, GH / 2 - 50, 48, argb(150 * pros2, 255, 255, 255), style:=FontStyleBold, align:=StringAlignmentCenter
     Page.Writes DateDiff("d", Now, Gaokao), GW / 2, GH / 2 - 100, 102, argb(255 * pros2, 255, 255, 255), style:=FontStyleBold, align:=StringAlignmentCenter
     Page.Writes Month(Now) & "月" & Day(Now) & "日  " & format(Hour(Now), "00") & ":" & format(Minute(Now), "00"), GW / 2, GH / 2 + 100 - 50, 36, argb(150 * pros2, 255, 255, 255), style:=FontStyleBold, align:=StringAlignmentCenter
