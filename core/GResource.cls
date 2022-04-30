@@ -25,7 +25,7 @@ Private Sub Class_Initialize()
     SearchIndex = 1
     NoLoadDirection = True
     NoLoadCrash = True
-    HotLoad = True
+    'HotLoad = True
 End Sub
 Public Sub ClipCircle(n)
     Dim index As Integer
@@ -221,6 +221,8 @@ Private Sub ReDraw(I As Integer)
         PoolDeleteGraphics g
     Next
     
+    If NoLoadCrash Then Exit Sub
+    
     Dim tempCo As Long, tCo(3) As Byte
     Dim iW As Long, iH As Long
 
@@ -353,7 +355,7 @@ Public Function GetImage(ByVal Name As String) As Integer
         End If
     End If
 End Function
-Public Sub newImage(path As String, Optional arg1, Optional arg2, Optional Name As String = "")
+Public Sub newImage(path As String, Optional arg1, Optional arg2, Optional Name As String = "", Optional Blur As Boolean = False)
     'when arg1 is missing ; i.w = i.w
     'when arg2 is missing but arg1 has content ; i.w = i.w * arg1
     'other ; i.w = arg1
@@ -362,6 +364,7 @@ Public Sub newImage(path As String, Optional arg1, Optional arg2, Optional Name 
     If IsMissing(arg2) And (Not IsMissing(arg1)) Then si = 1
     If (Not IsMissing(arg2)) And (Not IsMissing(arg1)) Then si = 2
     
+    DoEvents
     PoolCreateBitmapFromFile StrPtr(path), I
     GdipGetImageWidth I, w: GdipGetImageHeight I, h
     
@@ -416,6 +419,8 @@ Public Sub newImage(path As String, Optional arg1, Optional arg2, Optional Name 
         Mems(UBound(Mems)).Imgs(S) = DC
     Next
     
+    If Blur Then ApplyBlurEffect Mems(UBound(Mems)).Name, 60, 0
+    
     If w > GW * 0.5 Or h > GH * 0.5 Or NoLoadCrash Then Exit Sub
     
     Dim tempCo As Long, tCo(3) As Byte
@@ -439,7 +444,7 @@ Public Sub newImage(path As String, Optional arg1, Optional arg2, Optional Name 
     
     Mems(UBound(Mems)).CrashIndex = UBound(ColorLists)
 End Sub
-Public Sub NewImages(path As String, Optional arg1, Optional arg2)
+Public Sub NewImages(path As String, Optional arg1, Optional arg2, Optional Blur As Boolean = False)
 
     If HotLoad Then
         ReDim Preserve AssetsFolder(UBound(AssetsFolder) + 1)
@@ -482,11 +487,11 @@ Public Sub NewImages(path As String, Optional arg1, Optional arg2)
     I = 1
     Do While f <> ""
         If IsMissing(arg1) Then
-            newImage path & f
+            newImage path & f, Blur:=Blur
         ElseIf IsMissing(arg2) Then
-            newImage path & f, arg1
+            newImage path & f, arg1, Blur:=Blur
         Else
-            newImage path & f, arg1, arg2
+            newImage path & f, arg1, arg2, Blur:=Blur
         End If
         Tree.Files(I) = Mems(UBound(Mems))
         I = I + 1

@@ -85,22 +85,24 @@ Public RenderMode As ERenderMode
         
         GetHeight = R.Bottom
     End Function
-    Public Sub Writes(Text As String, X As Single, y As Single, g As Long, Color As Long, ByVal size As Long, w As Single, h As Single, ByVal align As StringAlignment, ByVal style As FontStyle, Optional ByVal BorderColor As Long, Optional ByVal BorderSize As Long = 0)
+    Public Sub Writes(Text As String, X As Single, y As Single, g As Long, Color As Long, ByVal size As Long, w As Single, h As Single, ByVal align As StringAlignment, ByVal style As FontStyle, Optional ByVal BorderColor As Long, Optional ByVal BorderSize As Long = 0, Optional YourBrush As Long = 0)
         'On Error Resume Next
-        If Font(style, size) = 0 Then
-            PoolCreateFont fFam, size, style, UnitPixel, Font(style, size)
+        Dim tSize As Long
+        tSize = size * 1.12
+        If Font(style, tSize) = 0 Then
+            PoolCreateFont fFam, size, style, UnitPixel, Font(style, tSize)
         End If
         If EmHeight = 0 Then EmHeight = GetHeight(g, "ABCDEFG", 18, StringAlignmentNear, FontStyleRegular)
         
         GdipSetSolidFillColor brush, Color
         
         If RenderMode <> RenderModeFillPath Then
-            GdipDrawString g, StrPtr(Text), -1, Font(style, size), NewRectF(X, y, w, h), StrF(align), brush
+            GdipDrawString g, StrPtr(Text), -1, Font(style, tSize), NewRectF(X, y, w, h), StrF(align), brush
         Else
             GdipResetPath Spath
-            GdipAddPathString Spath, StrPtr(Text), -1, fFam, style, size, NewRectF(X, y, w, h), StrF(align)
+            GdipAddPathString Spath, StrPtr(Text), -1, fFam, style, tSize, NewRectF(X, y, w, h), StrF(align)
             
-            GdipFillPath g, brush, Spath
+            GdipFillPath g, IIf(YourBrush <> 0, YourBrush, brush), Spath
             If BorderSize > 0 Then
                 GdipSetPenColor Spen, BorderColor
                 GdipSetPenWidth Spen, BorderSize

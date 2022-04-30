@@ -52,6 +52,7 @@ Private Sub WriteDates()
 End Sub
 Public Sub Update()
     '应用界面每一帧刷新会调用的方法（页面绘制代码请放在此处）
+    On Error Resume Next
     
     Page.Clear argb(0, 0, 0, 0) '清空画布
 
@@ -113,9 +114,27 @@ Public Sub Update()
     End If
     
     If setMode Then PaintDC ScrBlurDC, Page.CDC, 0, 0, 0, 0, GW, GH, alpha:=pro3
-    Page.DrawImage "bar2.png", 160 - 500 * (1 - pro1), 10, alpha:=pro1 * 0.6
-    Page.Writes format(Hour(Now), "00") & ":" & format(Minute(Now), "00"), 242, 19, 32, Color:=argb(255 * pros1, 255, 255, 255), align:=StringAlignmentCenter, style:=FontStyleBold
-    If setMode Then Page.Paint 0, 0, 0, GW + 1, GH + 1, argb(180 * pro3, 0, 0, 16)
+    'Page.DrawImage "bar2.png", 160 - 500 * (1 - pro1), 10, alpha:=pro1 * 0.6
+    
+    If (GetTickCount - useTime) / 1000 >= 19 * 60 Then
+        Page.DrawImage "locktip.png", GW / 2, 100, alpha:=1, pos:=posOnCenter
+        Page.DrawImage "hide1hour.png", GW / 2 - 0, 140, alpha:=1, pos:=posOnCenter
+        If CheckMouse2 = mMouseUp Then
+            hideTime = GetTickCount: hideMinute = 60
+            setMode = False: ECore.NewTransform
+        End If
+        Page.DrawImage "cancel.png", GW / 2 + 230, 140, alpha:=1, pos:=posOnCenter
+        If CheckMouse2 = mMouseUp Then
+            mode = False
+            useTime = GetTickCount
+            switchTime = GetTickCount
+            Mouse.State = 0
+            ECore.NewTransform
+        End If
+    End If
+    
+    Page.Writes format(Hour(Now), "00") & ":" & format(Minute(Now), "00"), 222, 19, 32, Color:=argb(255 * pros1, 255, 255, 255), align:=StringAlignmentCenter, style:=FontStyleBold, BorderColor:=argb(255 * pros1, 0, 0, 0), BorderSize:=2
+    If setMode Then Page.Paint 0, 0, 0, GW + 1, GH + 1, argb(120 * pro3, 0, 0, 16)
     Page.DrawImage "bar1.png", 20 - 200 * (1 - pro1), 10, alpha:=pro1 * 0.8 - IIf(setMode, pro3 * 0.8, 0)
     Page.DrawImage "bar3.png", 20 - 200 * (1 - pro1), 10, alpha:=IIf(setMode, pro3, 0)
     If CheckMouse2 = mMouseUp Then
@@ -127,7 +146,7 @@ Public Sub Update()
         Mouse.State = 0
         Exit Sub
     End If
-    If GetTickCount - useTime >= 15 * 60000 Then
+    If GetTickCount - useTime >= 20 * 60000 Then
         mode = Not mode
         useTime = GetTickCount
         If App.LogMode <> 0 Then SetWindowPos AppWindow.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE Or SWP_NOMOVE
@@ -135,7 +154,9 @@ Public Sub Update()
         switchTime = GetTickCount
         Mouse.State = 0
     End If
-    If Not setMode And pros1 = 1 Then Sleep 300
+    If setMode = False And pros1 = 1 And mode = False Then
+        Sleep 300
+    End If
     
     If DateDiff("d", Now, Gaokao) < 0 Then
         Page.Writes "已到期", 92, 19, 32, Color:=argb(255 * pros1, 255, 255, 255), align:=StringAlignmentCenter, style:=FontStyleBold
@@ -144,7 +165,7 @@ Public Sub Update()
     End If
     
     If setMode Then
-        Page.Writes "2022届高三八班倒计时程序" & vbCrLf & "版本号：0.5.17，制作：Buger404", 30, GH - 120, 24, argb(180 * pro3, 255, 255, 255)
+        Page.Writes "2022届高三八班倒计时程序（高考必胜！）" & vbCrLf & "版本号：0.9.85（最终版），制作：Buger404（QQ 1361778219）", 30, GH - 120, 24, argb(180 * pro3, 255, 255, 255)
         Page.DrawImage "menubtn1.png", 30 - 200 * (1 - pro3), 100, alpha:=pro3
         If CheckMouse2 = mMouseUp Then
             mode = Not mode
@@ -178,6 +199,7 @@ Public Sub Update()
         Page.DrawImage "menubtn1.png", 30 - 200 * (1 - pro3), 380, alpha:=pro3
         If CheckMouse2 = mMouseUp Then
             setMode = False: ECore.NewTransform
+            DoEvents
         End If
         Page.Writes "关闭此菜单", 50 - 200 * (1 - pro3), 380 + 7, 24, argb(255 * pro3, 32, 32, 32), style:=FontStyleBold
         Page.DrawImage "setdialog.png", GW - 580 * pro3, 60, alpha:=pro3
@@ -298,53 +320,79 @@ bypass1:
         pros2 = pro2
     End If
     If pro2 = 0 Then GoTo bypass2
-    'Page.DrawImage "wallspaper (" & lockBgn & ").jpg", 0, 0, alpha:=pro2
+    Page.DrawImage "wallspaper (" & lockBgn & ").jpg", 0, 0, alpha:=pro2 * 0.85
     'PaintDC ScrBlurDC, Page.CDC, 120 * pro2, 120 * pro2, 120 * pro2, 120 * pro2, GW - 240 * pro2, GH - 240 * pro2, alpha:=pro2
     'Page.Paint 0, 120 * pro2, 120 * pro2, GW - 240 * pro2 + 1, GH - 240 * pro2 + 1, argb(pro2 * 200, 1, 1, 1)
-    Page.Paint 0, 0, 0, GW + 1, GH + 1, argb(pro2 * 230, 1, 1, 1)
+    Page.Paint 0, 0, 0, GW + 1, GH + 1, argb(pro2 * 190, 1, 1, 1)
 
     '37,179,253 -> 179,36,255
 
-    Dim leftD As Single, DX As Long, DY As Long, BY As Long, NX As Long, NY As Long, dP As Single
+    Dim p(), leftD As Single, DY As Long
+    ReDim p(1)
     leftD = DateDiff("d", Now, Gaokao)
-    BY = 120 + 0.5 * (GH - 240)
-    DX = 0: DY = BY + Sin(GetTickCount / 6000) * (60 * (leftD / 365))
-    For I = 0 To 120
-        dP = (I * 1#) / 120
-        NX = 0 + dP * GW
-        NY = BY + Sin(GetTickCount / 6000 + dP * pros2 * 5) * (60 * (leftD / 365))
-        Page.PaintLine DX, DY, NX, NY, argb((100 + 80 * Sin(GetTickCount / 3000)) * pros2, 37 + (179 - 37) * dP, 179 + (36 - 179) * dP, 253 + (255 - 253) * dP), 2
-        DX = NX: DY = NY
+    DY = 120 + 0.5 * (GH - 240)
+    p(0) = 0: p(1) = DY + Sin(GetTickCount / 6000) * (20 * 1)
+    For I = 0 To 30
+        ReDim Preserve p(UBound(p) + 2)
+        p(UBound(p) - 1) = 0 + (I * 1#) / 30 * GW
+        p(UBound(p)) = DY + Sin(GetTickCount / 6000 + I * pros2 / 30 * 5) * 20
     Next
-
+    ReDim Preserve p(UBound(p) + 2)
+    p(UBound(p) - 1) = GW
+    p(UBound(p)) = GH
+    ReDim Preserve p(UBound(p) + 2)
+    p(UBound(p) - 1) = 0
+    p(UBound(p)) = GH
+    ReDim Preserve p(UBound(p) + 2)
+    p(UBound(p) - 1) = 0
+    p(UBound(p)) = DY + Sin(GetTickCount / 6000) * 20
+    Dim brush As Long
+    GdipCreateLineBrush NewPointF(GW / 2, 120 + 0.5 * (GH - 240) - 50), NewPointF(GW / 2, GH), argb(18 * pros2, 255, 255, 255), argb(0, 0, 0, 1), WrapModeTile, brush
+    Page.PaintPolygon2 argb(7 * pros2, 255, 255, 255), 0, p, False, brush
+    GdipDeleteBrush brush
+    ReDim p(1)
     leftD = DateDiff("d", Now, Gaokao)
-    BY = 100 + 0.5 * (GH - 240)
-    DX = 0: DY = BY + Sin(GetTickCount / 3000 - 3) * (60 * (leftD / 365))
-    For I = 0 To 120
-        dP = (I * 1#) / 120
-        NX = 0 + dP * GW
-        NY = BY + Sin(GetTickCount / 3000 + dP * pros2 * 5 - 3) * (60 * (leftD / 365))
-        Page.PaintLine DX, DY, NX, NY, argb((100 + 80 * Sin(GetTickCount / 6000)) * pros2, 0 + (0 - 0) * dP, 235 + (174 - 235) * dP, 115 + (247 - 115) * dP), 2
-        DX = NX: DY = NY
+    DY = 100 + 0.5 * (GH - 240)
+    p(0) = 0: p(1) = DY + Sin(GetTickCount / 3000 - 3) * 20
+    For I = 0 To 30
+        ReDim Preserve p(UBound(p) + 2)
+        p(UBound(p) - 1) = 0 + (I * 1#) / 30 * (GW)
+        p(UBound(p)) = DY + Sin(GetTickCount / 3000 + I * pros2 / 30 * 5 - 3) * 20
     Next
+    ReDim Preserve p(UBound(p) + 2)
+    p(UBound(p) - 1) = GW
+    p(UBound(p)) = 120 + GH
+    ReDim Preserve p(UBound(p) + 2)
+    p(UBound(p) - 1) = 0
+    p(UBound(p)) = 120 + GH
+    ReDim Preserve p(UBound(p) + 2)
+    p(UBound(p) - 1) = 0
+    p(UBound(p)) = DY + Sin(GetTickCount / 3000 - 3) * 20
+    GdipCreateLineBrush NewPointF(GW / 2, 120 + 0.5 * (GH - 240) - 50), NewPointF(GW / 2, GH), argb(18 * pros2, 255, 255, 255), argb(0, 0, 0, 1), WrapModeTile, brush
+    Page.PaintPolygon2 argb(13 * pros2, 255, 255, 255), 0, p, False, brush
+    GdipDeleteBrush brush
 
-    Page.Writes "仅剩                天", GW / 2 - 20, GH / 2 - 50, 48, argb(150 * pros2, 255, 255, 255), style:=FontStyleBold, align:=StringAlignmentCenter
-    Page.Writes DateDiff("d", Now, Gaokao), GW / 2, GH / 2 - 100, 102, argb(255 * pros2, 255, 255, 255), style:=FontStyleBold, align:=StringAlignmentCenter
-    Page.Writes Month(Now) & "月" & Day(Now) & "日  " & format(Hour(Now), "00") & ":" & format(Minute(Now), "00"), GW / 2, GH / 2 + 100 - 50, 36, argb(150 * pros2, 255, 255, 255), style:=FontStyleBold, align:=StringAlignmentCenter
+    Page.Writes "仅剩                天", GW / 2 - 20, GH / 2 - 60, 48, argb(150 * pros2, 255, 255, 255), align:=StringAlignmentCenter
+    GdipCreateLineBrush NewPointF(GW / 2 - 100, GH / 2 + Sin(GetTickCount / 6000) * 150), NewPointF(GW / 2 + 100, GH / 2 - Sin(GetTickCount / 6000) * 150), argb(255 * pros2, 179, 32, 255), argb(255 * pros2, 253, 63, 2), WrapModeTile, brush
+    Page.Writes DateDiff("d", Now, Gaokao), GW / 2, GH / 2 - 120, 132, argb(255 * pros2, 255, 255, 255), style:=FontStyleBold, align:=StringAlignmentCenter, YourBrush:=brush
+    GdipDeleteBrush brush
+    Page.Writes Month(Now) & "月" & Day(Now) & "日  " & format(Hour(Now), "00") & ":" & format(Minute(Now), "00"), GW / 2, GH / 2 + 100 - 50, 36, argb(255 * pros2, 255, 255, 255), align:=StringAlignmentCenter
     Dim diffDay As Long
     DY = GH / 2 + 180 - 50
     For I = 1 To UBound(Dates)
         If Not Dates(I).isDisplay Then
             diffDay = DateDiff("d", Now, Dates(I).Date)
             If diffDay >= 0 Then
-                Page.Writes "距离" & Dates(I).Name & "仅剩" & diffDay & "天", GW / 2, DY, 36, argb(220 * pros2, 255, 255, 255), style:=FontStyleBold, align:=StringAlignmentCenter
+                Page.Writes "距离" & Dates(I).Name & "仅剩" & diffDay & "天", GW / 2, DY, 30, argb(190 * pros2, 255, 255, 255), align:=StringAlignmentCenter
                 DY = DY + 50
             End If
         End If
     Next
     
-    Page.Writes "高三八班加油!!!  (≧^≦)/", GW / 2, 20, 24, argb(150 * pros2, 255, 255, 255), style:=FontStyleBold, align:=StringAlignmentCenter
-
+    Page.Writes "- Stay DETERMINED -", GW / 2, 20, 24, argb(100 * pros2, 255, 255, 255), style:=FontStyleBold, align:=StringAlignmentCenter
+    Page.Writes "- 点击屏幕任意处退出锁屏 -", GW / 2, GH - 150, 24, argb(100 * pros2, 255, 255, 255), style:=FontStyleBold, align:=StringAlignmentCenter
+    Page.Writes "Made by Buger404/the ultimate version/wish your every success", GW / 2, GH - 100, 24, argb(100 * pros2, 255, 255, 255), style:=FontStyleBold, align:=StringAlignmentCenter
+    
     'Page.Writes "高三时间仅剩 " & format(Int((leftD + (leftH * 60 + leftM) / (24 * 60)) / 365 * 10000) / 100, "00.00") & "%", GW / 2, GH - 94, 32, argb(100 * pros2, 255, 255, 255), align:=StringAlignmentCenter
 
 bypass2:
@@ -386,7 +434,7 @@ Private Sub Class_Initialize()
     Set Page = New GPage  '创建页面绘制器
     Page.Create Me  '将绘制器与控制器绑定
     Page.Res.NewImages App.path & "\assets", 0.3 '导入资源
-    Page.Res.NewImages App.path & "\assets\locks", GW, GH
+    Page.Res.NewImages App.path & "\assets\locks", GW, GH, True
     Page.Res.newImage App.path & "\assets\lock.jpg", GW, GH, "lockbg"
     Page.Res.ApplyBlurEffect "lockbg", 60, 0
     ScrBlurDC = CreateCDC(GW, GH)

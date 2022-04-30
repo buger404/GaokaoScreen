@@ -421,7 +421,7 @@ Public IsSystem As Boolean
     End Sub
 '========================================================
 '   Writer
-    Public Sub Writes(ByVal Text As String, ByVal X As Single, ByVal y As Single, Optional size As Long = 14, Optional Color As Long, Optional ByVal w As Single = 0, Optional ByVal h As Single = 0, Optional align As StringAlignment = StringAlignmentNear, Optional style As FontStyle = FontStyleRegular, Optional animation As Integer = 0, Optional ByVal BorderColor As Long, Optional ByVal BorderSize As Long = 0)
+    Public Sub Writes(ByVal Text As String, ByVal X As Single, ByVal y As Single, Optional size As Long = 14, Optional Color As Long, Optional ByVal w As Single = 0, Optional ByVal h As Single = 0, Optional align As StringAlignment = StringAlignmentNear, Optional style As FontStyle = FontStyleRegular, Optional animation As Integer = 0, Optional ByVal BorderColor As Long, Optional ByVal BorderSize As Long = 0, Optional YourBrush As Long = 0)
         'If OutOfScroll Then Exit Sub
         
         If ECore.FreezeAvailable And (Not IsSystem) Then Exit Sub
@@ -452,7 +452,7 @@ Public IsSystem As Boolean
             End If
         End If
         
-        EF.Writes Text, OX, OY, GG, Color, size, w, h, align, style, BorderColor, BorderSize
+        EF.Writes Text, OX, OY, GG, Color, size, w, h, align, style, BorderColor, BorderSize, YourBrush
         With DrawF
             .X = OX
             .y = OY
@@ -728,7 +728,7 @@ ReShape:
             Call JudgeChoosePosition(OX, OY, ow, oh)
         End If
     End Sub
-    Public Sub PaintPolygon2(Color As Long, style As Integer, Points(), Optional SmoothMode As Boolean = False)
+    Public Sub PaintPolygon2(Color As Long, style As Integer, Points(), Optional SmoothMode As Boolean = False, Optional YourBrush As Long = 0)
     
         If ECore.FreezeAvailable And (Not IsSystem) Then Exit Sub
         
@@ -755,7 +755,7 @@ ReShape:
             GdipSetPenWidth Pen, size
         End If
         
-        If style = 0 Then GdipFillPath GG, brush, path
+        If style = 0 Then GdipFillPath GG, IIf(YourBrush <> 0, YourBrush, brush), path
         If style = 1 Then GdipDrawPath GG, Pen, path
         
         If IsSystem Then Exit Sub
@@ -767,7 +767,7 @@ ReShape:
             GdipDrawPath GG, Pen, path
         End If
     End Sub
-    Public Sub PaintPolygon(Color As Long, style As Integer, SmoothMode As Boolean, ParamArray Points())
+    Public Sub PaintPolygon(Color As Long, style As Integer, SmoothMode As Boolean, YourBrush As Long, ParamArray Points())
         
         If ECore.FreezeAvailable And (Not IsSystem) Then Exit Sub
      
@@ -794,7 +794,7 @@ ReShape:
             GdipSetPenWidth Pen, size
         End If
         
-        If style = 0 Then GdipFillPath GG, brush, path
+        If style = 0 Then GdipFillPath GG, IIf(YourBrush <> 0, YourBrush, brush), path
         If style = 1 Then GdipDrawPath GG, Pen, path
         
         If IsSystem Then Exit Sub

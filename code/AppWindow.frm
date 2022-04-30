@@ -43,7 +43,8 @@ Private Sub Form_Load()
     If App.LogMode <> 0 Then SetWindowPos AppWindow.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE Or SWP_NOMOVE
     StartEmerald Me.Hwnd, Screen.Width / Screen.TwipsPerPixelX + 1, Screen.Height / Screen.TwipsPerPixelY + 1 '初始化Emerald（在此处可以修改窗口大小）
     Set EF = New GFont
-    EF.MakeFont "微软雅黑"
+    EF.AddFont App.path & "\ui.ttf"
+    EF.MakeFont "Aa马上行楷"
    
     Set EC = New GMan   '创建页面管理器
     EC.Layered False
@@ -81,6 +82,7 @@ End Sub
 Private Sub DrawTimer_Timer()
     '绘制界面并刷新窗口画面
     EC.Display
+    DoEvents
 End Sub
 
 '============================================================
